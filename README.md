@@ -1,16 +1,24 @@
 # TraceSplitter
 ## How to Run?
 
-Run the `scalingMethods.py` file by defining the following variables in the main function
+
+Run the `scalingMethods.py` file 
 ```
-inputFile: the address of the original workload
-scalingFactor: the scaling factor required, 0 < scalingFactor <= 1
-bucket: for model based sampling, time bucket duration (second)
+python3 scalingMethods.py $inputFile $scalingFactor $bucket
 ```
+
+The variables are the following:
+
+__inputFile:__ the address of the original workload
+
+__scalingFactor:__ the scaling factor required, 0 < scalingFactor <= 1
+
+__bucket:__ for model based sampling, time bucket duration (second)
+
 
 ## ReqSizeEstimation
 
-Modify `src/userDefinedMethods.reqSizeEstimation(requestSize,details)` function to get service time from `requestSize` and `opaqueData` from your workload respectively.
+Modify `src/userDefinedMethods.reqSizeEstimation(requestSize,details)` function to get service time from `requestSize` and `details` from your workload respectively.
 
 Example:
 ```python
@@ -18,16 +26,16 @@ Example:
 Example 1:
 all the requests have same service time
 '''
-def reqSizeEstimation(size, details):
+def reqSizeEstimation(requestSize, details):
     return 1
 
 
 '''
 Example 2:
-let, details can have request type in a social media application i.e. calue of details  can be LOGIN or POST or SEND_MESSAGE
+details can have request type in a social media application i.e. value of details can be LOGIN or POST or SEND_MESSAGE
 '''
 
-def reqSizeEstimation(requestSize,details):
+def reqSizeEstimation(requestSize, details):
     if details=="LOGIN":
         return requestSize*2
     elif details=="POST":
@@ -41,7 +49,7 @@ def reqSizeEstimation(requestSize,details):
 The trace file should be of the following format:
 
 ```
-arrivalTime, requestSize, details
+arrivalTime,requestSize,details
 ```
 The data type should be:
 ```

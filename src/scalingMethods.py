@@ -1,11 +1,11 @@
 import scaling
-from math import *  #for ceil function
-import numpy.random as np   #for random number generation np.random.rand(1)
+from math import *  # for ceil function
+import numpy.random as np  # for random number generation np.random.rand(1)
 import random  # for shuffling array random.shuffle()
 from queue import PriorityQueue
 from random import seed
 from random import randint
-
+import sys
 
 
 def checkFactor(factor):
@@ -13,16 +13,16 @@ def checkFactor(factor):
         print("Invalid input")
         exit()
 
+
 def timeSpanScaling(inputFilename, factor):
     checkFactor(factor)
 
     scale = 1/factor
 
-    ''' assumption about filename format???'''
     outputFilename = str.split(inputFilename, ".")[0] + "tspan.txt"
 
     reader = scaling.TraceReader(inputFilename)
-    writer = scaling.TraceWriter(outputFilename) # only one writer in random
+    writer = scaling.TraceWriter(outputFilename)
 
     nextReq = reader.readNextReq()
     while nextReq:
@@ -38,6 +38,7 @@ def timeSpanScaling(inputFilename, factor):
 
     return
 
+
 def randomSampling(inputFilename, factor):
     checkFactor(factor)
 
@@ -45,14 +46,13 @@ def randomSampling(inputFilename, factor):
     outputFilename = str.split(inputFilename, ".")[0] + "rand" + ".txt"
 
     reader = scaling.TraceReader(inputFilename)
-    writer = scaling.TraceWriter(outputFilename) # only one writer in random
+    writer = scaling.TraceWriter(outputFilename)
 
     nextReq = reader.readNextReq()
     while nextReq:
         if np.rand(1) <= probability:
             writer.writeNextReq(nextReq)
         nextReq = reader.readNextReq()
-
 
     '''Close files'''
     reader.finish()
@@ -77,12 +77,11 @@ def roundRobinSamplingAll(inputFilename, factor):
         p_n = factor
         p_resampling = (p_n - p_x) / (1-p_x)
 
-
     writer = [0] * numberOfnServers
     currentServerIdx = 0
 
     reader = scaling.TraceReader(inputFilename)
-    for i in range(0, numberOfnServers):       # range does [start, end)
+    for i in range(0, numberOfnServers):
         outputFilename = str.split(inputFilename, ".")[0] + str(i+1) + "rr.txt"
         writer[i] = scaling.TraceWriter(outputFilename)
     if numberOfxServers == 1:
@@ -128,7 +127,6 @@ def randomRoundRobinSamplingAll(inputFilename, factor):
 
     writer = [0] * numberOfnServers
 
-
     serverPriority = []
     for i in range(0, numberOfnServers):
         serverPriority.append(i)
@@ -136,8 +134,9 @@ def randomRoundRobinSamplingAll(inputFilename, factor):
     currentServerIdx = 0
 
     reader = scaling.TraceReader(inputFilename)
-    for i in range(0, numberOfnServers):  # range does [start, end)
-        outputFilename = str.split(inputFilename, ".")[0] + str(i + 1) + "randrr.txt"
+    for i in range(0, numberOfnServers):
+        outputFilename = str.split(inputFilename, ".")[
+            0] + str(i + 1) + "randrr.txt"
         writer[i] = scaling.TraceWriter(outputFilename)
     if numberOfxServers == 1:
         outputFilename = str.split(inputFilename, ".")[0] + "Xrandrr.txt"
@@ -185,15 +184,15 @@ def leastWorkLeftAll(inputFilename, factor):
 
     writer = [0] * numberOfnServers
 
-
-    serverPriority = PriorityQueue()            #serverPriority queue has the tuple (totalReqSizeInThisQueue, queueIndex). It keeps track of amount of work in each queue and puts queue with least work left in the front
+    '''serverPriority queue has the tuple (totalReqSizeInThisQueue, queueIndex). It keeps track of amount of work in each queue and puts queue with least work left in the front'''
+    serverPriority = PriorityQueue()
     for i in range(0, (numberOfnServers + numberOfxServers)):
         serverPriority.put((0, i))
 
-
     reader = scaling.TraceReader(inputFilename)
     for i in range(0, numberOfnServers):
-        outputFilename = str.split(inputFilename, ".")[0] + str(i+1) + "lwl.txt"
+        outputFilename = str.split(inputFilename, ".")[
+            0] + str(i+1) + "lwl.txt"
         writer[i] = scaling.TraceWriter(outputFilename)
     if numberOfxServers == 1:
         outputFilename = str.split(inputFilename, ".")[0] + "Xlwl.txt"
@@ -224,16 +223,18 @@ def leastWorkLeftAll(inputFilename, factor):
 
     return
 
+
 def modelBasedSimple(inputFilename, factor, bucketSize):
     checkFactor(factor)
     nanoSecInSec = 1000000000
 
-    bucketSize = bucketSize * nanoSecInSec # in nanoseconds, same unit as timestamp in file
+    # in nanoseconds, same unit as timestamp in file
+    bucketSize = bucketSize * nanoSecInSec
 
     outputFilename = str.split(inputFilename, ".")[0] + "model.txt"
 
     reader = scaling.TraceReader(inputFilename)
-    writer = scaling.TraceWriter(outputFilename)  # only one writer in model Based
+    writer = scaling.TraceWriter(outputFilename)
 
     nextReq = reader.readNextReq()
 
@@ -273,13 +274,13 @@ def modelBasedSimple(inputFilename, factor, bucketSize):
     reader.finish()
     writer.finish()
 
-
     return
 
+
 def main():
-    inputFile = "/Users/rxh655/OneDrive - The Pennsylvania State University/Research/Code/ScalingTrace/ScalingTrace/traceScaling/input/generic_trace_file.txt"
-    scalingFactor = 1
-    bucket = 20
+    inputFile = str(sys.argv[1])
+    scalingFactor = float(sys.argv[2])
+    bucket = float(sys.argv[3])
 
     modelBasedSimple(inputFile, scalingFactor, bucketSize=bucket)
     timeSpanScaling(inputFile, scalingFactor)
@@ -291,4 +292,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
