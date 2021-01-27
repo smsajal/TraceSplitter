@@ -5,7 +5,7 @@ import random  # for shuffling array random.shuffle()
 from queue import PriorityQueue
 from random import seed
 from random import randint
-import sys
+import argparse
 
 
 def checkFactor(factor):
@@ -224,7 +224,7 @@ def leastWorkLeftAll(inputFilename, factor):
     return
 
 
-def modelBasedSimple(inputFilename, factor, bucketSize):
+def avgRateScaling(inputFilename, factor, bucketSize):
     checkFactor(factor)
     nanoSecInSec = 1000000000
 
@@ -277,17 +277,52 @@ def modelBasedSimple(inputFilename, factor, bucketSize):
     return
 
 
-def main():
-    inputFile = str(sys.argv[1])
-    scalingFactor = float(sys.argv[2])
-    bucket = float(sys.argv[3])
+def scalingFactorLimit(arg):
+    max = 1
+    min = 0
+    """ Type function for argparse - a float within some predefined bounds """
+    try:
+        f = float(arg)
+    except ValueError:
+        raise argparse.ArgumentTypeError("Must be a floating point number")
+    if f <= min or f > max:
+        raise argparse.ArgumentTypeError(
+            "Argument must be <= " + str(max) + "and > " + str(min))
+    return f
 
-    modelBasedSimple(inputFile, scalingFactor, bucketSize=bucket)
-    timeSpanScaling(inputFile, scalingFactor)
-    randomSampling(inputFile, scalingFactor)
-    randomRoundRobinSamplingAll(inputFile, scalingFactor)
-    roundRobinSamplingAll(inputFile, scalingFactor)
-    leastWorkLeftAll(inputFile, scalingFactor)
+
+def main():
+    print("Main")
+
+    my_parser = argparse.ArgumentParser(
+        allow_abbrev=False, description='downscale the trace using TraceSplitter')
+    my_parser.add_argument("--traceFile", action='store',
+                           type=str, required=True, metavar='path of the trace to be scaled')
+    my_parser.add_argument("--downscalingScheme",
+                           action='store', type=str, default="LWL", choices=["avgRateScaling", "tspan", "randomSampling", "RRR", "RR", "LWL"], metavar='downscaling technique to be used, default is TS-LWL')
+    my_parser.add_argument("--bucket", action='store', type=float, default=1.0,
+                           metavar='duration of time bucket size (seconds) for AvgRateScaling, default is 1.0')
+    my_parser.add_argument("--scalingFactor", action='store',
+                           type=scalingFactorLimit, default=0.5, metavar='scaling factor for downscaling, 0 < scalingFactor <= 1, default is 0.5')
+
+    args = my_parser.parse_args()
+
+    traceFile = args.traceFile
+    downscalingScheme = args.downscalingScheme
+    bucketSize = args.bucket
+    scalingFactor = args.scalingFactor
+    if downscalingScheme == "avgRateScaling":
+        avgRateScaling(traceFile, scalingFactor, bucketSize)
+    elif downscalingScheme == "tspan":
+        timeSpanScaling(traceFile, scalingFactor)
+    elif downscalingScheme == "randomSampling":
+        randomSampling(traceFile, scalingFactor, "")
+    elif downscalingScheme == "RRR":
+        randomRoundRobinSamplingAll(traceFile, scalingFactor)
+    elif downscalingScheme == "RR":
+        roundRobinSamplingAll(traceFile, scalingFactor)
+    elif downscalingScheme == "LWL":
+        leastWorkLeftAll(traceFile, scalingFactor)
 
 
 if __name__ == "__main__":
