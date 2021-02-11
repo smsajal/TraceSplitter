@@ -231,7 +231,7 @@ def avgRateScaling(inputFilename, factor, bucketSize):
     # in nanoseconds, same unit as timestamp in file
     bucketSize = bucketSize * nanoSecInSec
 
-    outputFilename = str.split(inputFilename, ".")[0] + "model.txt"
+    outputFilename = str.split(inputFilename, ".")[0] + "avgRateScaling.txt"
 
     reader = scaling.TraceReader(inputFilename)
     writer = scaling.TraceWriter(outputFilename)
@@ -254,12 +254,11 @@ def avgRateScaling(inputFilename, factor, bucketSize):
 
         numberOfNewReq = round(len(requestList)*factor)
         timestamps = []
-        seed(1)
+
         for i in range(0, numberOfNewReq):
             timestamps.append(randint(timeStamp1, timeStamp2))
         timestamps = sorted(timestamps)
 
-        seed(1)
         for i in range(0, numberOfNewReq):
             randReqIdx = randint(0, len(requestList)-1)
             newReq = requestList[randReqIdx]
@@ -292,14 +291,13 @@ def scalingFactorLimit(arg):
 
 
 def main():
-    print("Main")
 
-    my_parser = argparse.ArgumentParser(
+    my_parser = argparse.Argumehttps://www.amazon.com/HP-23-8-inch-Adjustment-Speakers-VH240a/dp/B072M34RQC/ref=cm_cr_arp_d_product_top?ie=UTF8ntParser(
         allow_abbrev=False, description='downscale the trace using TraceSplitter')
     my_parser.add_argument("--traceFile", action='store',
                            type=str, required=True, metavar='path of the trace to be scaled')
     my_parser.add_argument("--downscalingScheme",
-                           action='store', type=str, default="LWL", choices=["avgRateScaling", "tspan", "randomSampling", "RRR", "RR", "LWL"], metavar='downscaling technique to be used, default is TS-LWL')
+                           action='store', type=str, default="LWL", choices=["avgRateScaling", "tspan", "randomSampling", "RRR", "RR", "LWL"], metavar='downscaling technique to be used, default is LWL')
     my_parser.add_argument("--bucket", action='store', type=float, default=1.0,
                            metavar='duration of time bucket size (seconds) for AvgRateScaling, default is 1.0')
     my_parser.add_argument("--scalingFactor", action='store',
@@ -316,7 +314,7 @@ def main():
     elif downscalingScheme == "tspan":
         timeSpanScaling(traceFile, scalingFactor)
     elif downscalingScheme == "randomSampling":
-        randomSampling(traceFile, scalingFactor, "")
+        randomSampling(traceFile, scalingFactor)
     elif downscalingScheme == "RRR":
         randomRoundRobinSamplingAll(traceFile, scalingFactor)
     elif downscalingScheme == "RR":
