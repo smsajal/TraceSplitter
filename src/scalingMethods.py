@@ -292,7 +292,7 @@ def scalingFactorLimit(arg):
 
 def main():
 
-    my_parser = argparse.Argumehttps://www.amazon.com/HP-23-8-inch-Adjustment-Speakers-VH240a/dp/B072M34RQC/ref=cm_cr_arp_d_product_top?ie=UTF8ntParser(
+    my_parser = argparse.ArgumentParser(
         allow_abbrev=False, description='downscale the trace using TraceSplitter')
     my_parser.add_argument("--traceFile", action='store',
                            type=str, required=True, metavar='path of the trace to be scaled')
