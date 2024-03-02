@@ -1,5 +1,5 @@
 import scaling
-from math import *  # for ceil function
+import math  # for ceil function
 import numpy.random as np  # for random number generation np.random.rand(1)
 import random  # for shuffling array random.shuffle()
 from queue import PriorityQueue
@@ -64,9 +64,9 @@ def randomSampling(inputFilename, factor):
 def roundRobinSamplingAll(inputFilename, factor):
     checkFactor(factor)
 
-    numberOfnServers = int(1 // factor)
+    numberOfnServers = int(math.floor(1.0 / factor))
     numberOfxServers = 1
-    if ceil(1 / factor) == 1 // factor:
+    if (factor-numberOfnServers)<=0:
         numberOfxServers = 0
 
     p_x = 0
@@ -111,9 +111,9 @@ def roundRobinSamplingAll(inputFilename, factor):
 def randomRoundRobinSamplingAll(inputFilename, factor):
     checkFactor(factor)
 
-    numberOfnServers = int(1 // factor)
+    numberOfnServers = int(math.floor(1.0 / factor))
     numberOfxServers = 1
-    if ceil(1 / factor) == 1 // factor:
+    if (factor-numberOfnServers)<=0:
         numberOfxServers = 0
 
     p_x = 0
@@ -168,9 +168,9 @@ def randomRoundRobinSamplingAll(inputFilename, factor):
 def leastWorkLeftAll(inputFilename, factor):
     checkFactor(factor)
 
-    numberOfnServers = int(1 // factor)
+    numberOfnServers = int(math.floor(1.0 / factor))
     numberOfxServers = 1
-    if ceil(1 / factor) == 1 // factor:
+    if (factor-numberOfnServers)<=0:
         numberOfxServers = 0
 
     p_x = 0
